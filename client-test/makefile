@@ -1,0 +1,2 @@
+deps:
+	pip install requests
