@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 import requests
 
 def bb_endpoint():
@@ -8,14 +8,13 @@ def bb_port():
 	return "8000"
 
 def bb_api():
-	return "/"
-	#return "/api"
+	return "build"
 
 def bb_hash():
-	return "hash"
+	return "dd345a551a7e9d72d13ef48bdce81e9c5e2adb74"
 
 def bb_remote():
-	return "remote"
+	return "https://github.com/bollu/ovpl.git"
 
 
 def is_bb_alive():
@@ -36,8 +35,8 @@ if __name__ == "__main__":
 
 	print "request to: " + request_fmt
 	print "data: " + str(data)
-	print "\n\n"
-	response = requests.get(request_fmt, data=data)
+	print "\n"
+	response = requests.get(request_fmt, params=data)
 
 	print response
 	print response.text
