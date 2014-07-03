@@ -11,7 +11,7 @@ def bb_api():
 	return "build"
 
 def bb_hash():
-	return "f4755cbcb92b2e50adcc79db82eca39984ea8cfd"
+	return "8d9427ccb17b0a9d38947133292aa649ffe4b4d5"
 
 def bb_remote():
 	#return "https://bollu@github.com/bollu/ovpl.git"

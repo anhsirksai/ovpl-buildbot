@@ -20,8 +20,8 @@ def build_endpoint():
 	git_remote = request.args.get("remote")
 
 
-	logger.info("git hash: {}".format(git_hash))
-	logger.info("git remote: {}".format(git_remote))
+	logger.debug("git hash: {}".format(git_hash))
+	logger.debug("git remote: {}".format(git_remote))
 
 	if git_hash == None:
 		return make_response("git hash not sent"), 400
@@ -33,20 +33,26 @@ def build_endpoint():
 	git_remote_str = str(git_remote).strip()
 
 	git_clone_path = construct_clone_path(git_hash)
-	ovpl_repo = git.Git(logger=logger, remote=git_remote_str, repo_folder_path=git_clone_path)
-	logger.info("cloning succeeded. Now checking out version {}".format(git_hash_str))
-	ovpl_repo.checkout(git_hash_str)
 
-	logger.info("starting OVPL tests...")
+	#clone and checkout
+	logger.info("cloning {}".format(git_clone_path))
+	ovpl_repo = git.Git(logger=logger, remote=git_remote_str, repo_folder_path=git_clone_path, git_hash=git_hash_str)
+	logger.info("cloning succeeded. Checking out {}".format(git_hash_str))
+
+	#run tests
+	ovpl_repo.checkout()
+	logger.debug("running test suite")
 	ovpl_instance = ovpl.OVPL(logger=logger, repo_folder_path=git_clone_path)
 	success = ovpl_instance.test()
 
 	if success:
+		logger.info("tests succeeded")
 		return make_response("build & test successful"), 200
 	else:
+		logger.error("tests failed")
 		return make_response("build & test unsucessful"), 400
 
-	return "success"
+
 @app.route("/")
 def slash_endpoint():
 	return "you're trying to reach buildbot. try and use /build ?"

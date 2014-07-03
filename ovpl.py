@@ -32,6 +32,28 @@ def get_tests(root_path):
 	return tests
 
 
+def get_test_description(testfn):
+	try:
+		import inspect
+		desc = inspect.getcomments(testfn)
+		if desc is not None:
+			return str(desc)
+	except Exception:
+		pass
+
+
+	try:
+		desc = testfn.__doc__
+		if desc is not None:
+			return str(desc)
+	except Exception:
+		pass
+
+
+	return "<None>"
+
+
+
 class OVPL:
 	def __init__(self, logger, repo_folder_path):
 		self.logger = logger
@@ -48,19 +70,23 @@ class OVPL:
 			filepath = test["path"]
 			filename = test["name"]
 
+
 			#find the relative file path of the test wrt scripts/ folder
 			relpath = os.path.relpath(filepath, self.tests_path)
 
+			self.logger.info("-")
 			self.logger.info("loading test: {}".format(relpath))
 			testfn = self.get_test_function(filepath, relpath)
 
 			if not testfn:
 				all_succeeded = False
 			else:
-				self.logger.debug("executing test() in file: {}".format(relpath))
+				self.logger.info("test description->\n {}".format(get_test_description(testfn)))
+				self.logger.info("executing test() in file: {}".format(relpath))
+
 				all_succeeded = self.execute_test(testfn, relpath) and all_succeeded
 
-			self.logger.info("-------\n")
+			self.logger.info("-\n")
 
 		return all_succeeded
 
@@ -69,7 +95,7 @@ class OVPL:
 		testmodule = None
 
 		try:
-			testmodule = imp.load_source("name", filepath)
+			testmodule = imp.load_source(relpath, filepath)
 		except Exception, e:
 			self.logger.error("unable to load module. file: {}".format(relpath))
 			self.logger.error("exception: {}".format(e))
@@ -80,7 +106,7 @@ class OVPL:
 		try:
 			testfn = getattr(testmodule, "test")
 		except Exception, e:
-			test_fn = None
+			testfn = None
 			self.logger.error("unable to find test(). file: {}".format(relpath))
 			self.logger.error("exception: {}".format(e))
 
@@ -89,22 +115,25 @@ class OVPL:
 
 
 	def execute_test(self, testfn, relpath):
+		def failure_string():
+			return ("!{} failed---").format(relpath)
 		try:
 			#pass the logger to the test function
 			success = testfn(self.logger)
 
 			if not isinstance(success, bool):
-				self.logger.error("---return value of test() is invalid: {}---".format(success))
+				self.logger.error("!return value of test() is invalid: {}---".format(success))
 				return False
 			elif success:
-				self.logger.info("---test succeeded!---")
+				self.logger.info("+{} succeeded---".format(relpath))
 				return True
 			else:
+				self.logger.error(failure_string())
 				return False
-				self.logger.error("---test failed---")
 
 		except Exception, e:
-			return False
 			self.logger.error("test {} threw exception".format(relpath))
 			self.logger.error("exception: {}".format(e))
+			self.logger.error(failure_string())
+			return False
 

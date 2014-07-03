@@ -12,7 +12,7 @@ def create_logger(name, file_path, should_log_stdout):
 
 	logger = logging.getLogger(name)
 
-	logger.setLevel(logging.INFO)   # make log level a setting
+	logger.setLevel(logging.DEBUG)   # make log level a setting
 
 	#don't attach the same handler multiple times
 	if logger.handlers == []:
@@ -66,10 +66,10 @@ class RainbowLoggingHandler(ColorizingStreamHandler):
 		logging.CRITICAL: ('red', 'white', True),
 	}
 
-	date_format = "%H:%m:%S"
-
+	#date_format = "%H:%m:%S"
+	date_format = "%Y-%m-%d %I:%M:%S %p"
 	#: How many characters reserve to function name logging
-	who_padding = 22
+	who_padding = 40
 
 	#: Show logger name
 	show_name = True
@@ -114,7 +114,7 @@ class RainbowLoggingHandler(ColorizingStreamHandler):
 		# https://www.youtube.com/watch?v=1HRa4X07jdE
 		template = [
 			"[",
-			self.get_color("black", None, True),
+			self.get_color("white", None, True),
 			"%(asctime)s",
 			self.reset,
 			"] ",
@@ -131,6 +131,8 @@ class RainbowLoggingHandler(ColorizingStreamHandler):
 		format = "".join(template)
 
 		who = [self.get_color("green"),
+			   getattr(record, "filename", ""),
+			   ": ",
 			   getattr(record, "funcName", ""),
 			   "()",
 			   self.get_color("black", None, True),
@@ -142,7 +144,8 @@ class RainbowLoggingHandler(ColorizingStreamHandler):
 
 		# We need to calculate padding length manualy
 		# as color codes mess up string length based calcs
-		unformatted_who = getattr(record, "funcName", "") + "()" + \
+		unformatted_who = str(getattr(record, "filename", "")) + \
+			    ": " + getattr(record, "funcName", "") + "()" + \
 			":" + str(getattr(record, "lineno", 0))
 
 		if len(unformatted_who) < self.who_padding:
