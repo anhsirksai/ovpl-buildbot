@@ -5,7 +5,7 @@ def bb_endpoint():
 	return "http://196.12.53.136"
 
 def bb_port():
-	return "8000"
+	return "10000"
 
 def bb_api():
 	return "build"
