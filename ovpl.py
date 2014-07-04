@@ -84,7 +84,7 @@ class OVPL:
 				self.logger.info("test description->\n {}".format(get_test_description(testfn)))
 				self.logger.info("executing test() in file: {}".format(relpath))
 
-				all_succeeded = self.execute_test(testfn, relpath) and all_succeeded
+				all_succeeded = self.execute_test(testfn, filepath, relpath) and all_succeeded
 
 			self.logger.info("-\n")
 
@@ -114,26 +114,34 @@ class OVPL:
 
 
 
-	def execute_test(self, testfn, relpath):
+	def execute_test(self, testfn, filepath, relpath):
 		def failure_string():
 			return ("!{} failed---").format(relpath)
-		try:
-			#pass the logger to the test function
-			success = testfn(self.logger)
 
-			if not isinstance(success, bool):
-				self.logger.error("!return value of test() is invalid: {}---".format(success))
-				return False
-			elif success:
-				self.logger.info("+{} succeeded---".format(relpath))
-				return True
-			else:
+		file_dir = os.path.dirname(filepath)
+
+		#change CWD to the script so that the script's relative paths work
+		self.logger.debug("changing cwd to {}".format(file_dir))
+		with plumbum.local.cwd(file_dir):
+			self.logger.debug("changed cwd. pwd: {}".format(plumbum.local.cwd))
+
+			try:
+				#pass the logger to the test function
+				success = testfn(self.logger)
+
+				if not isinstance(success, bool):
+					self.logger.error("!return value of test() is invalid: {}---".format(success))
+					return False
+				elif success:
+					self.logger.info("+{} succeeded---".format(relpath))
+					return True
+				else:
+					self.logger.error(failure_string())
+					return False
+
+			except Exception, e:
+				self.logger.error("test {} threw exception".format(relpath))
+				self.logger.error("exception: {}".format(e))
 				self.logger.error(failure_string())
 				return False
-
-		except Exception, e:
-			self.logger.error("test {} threw exception".format(relpath))
-			self.logger.error("exception: {}".format(e))
-			self.logger.error(failure_string())
-			return False
 

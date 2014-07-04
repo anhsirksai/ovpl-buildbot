@@ -23,7 +23,6 @@ class Git:
 			with plumbum.local.cwd(self.repo_path):
 				self.logger.debug("changed cwd. pwd: {}".format(plumbum.local.cwd))
 				reset_command = self.git_sh["reset", "--hard", "HEAD^"]
-
 			return
 
 			# self.logger.info("{} exists. deleting...".format(repo_folder_path))
@@ -33,13 +32,17 @@ class Git:
 		#construct the clone command and pipe output to foreground
 		clone_cmd = self.git_sh["clone", remote, repo_folder_path]
 		logger.debug("clone command: {}".format(clone_cmd))
-		clone_cmd & FG
 
+		try:
+			clone_cmd & FG
+		except Exception, e:
+			logging.logger.error("unable to clone {}".format(remote))
+			logging.logger.error("exception: {}".format(e))
 
 
 	def checkout(self):
 
-		checkout_cmd = self.git_sh["checkout"]#git_hash]
+		checkout_cmd = self.git_sh["checkout"]
 
 		self.logger.debug("changing cwd to {}...".format(self.repo_path))
 		#change path to the repo path and then run checkout
@@ -49,6 +52,9 @@ class Git:
 			self.logger.debug("checkout command: {}".format(checkout_cmd))
 			self.logger.debug("checking out {} ...".format(self.hash))
 
-			checkout_cmd(self.hash)
-
+			try:
+				checkout_cmd(self.hash)
+			except Exception, e:
+				self.logger.error("unable to checkout {}".format(self.hash))
+				self.logger.error("Exception: {}".format(e))
 			self.logger.debug("checked out {}".format(self.hash))
