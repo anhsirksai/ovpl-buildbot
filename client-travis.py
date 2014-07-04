@@ -13,7 +13,7 @@ def bb_api():
 	return "build"
 
 def bb_hash(git_sh):
-	return git_sh["rev-pase"]("HEAD")
+	return git_sh["rev-parse"]("HEAD")
 
 def bb_remote(git_sh):
 	return git_sh["config"]["--get"]["remote.origin.url"]
