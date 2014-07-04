@@ -144,7 +144,7 @@ class OVPL:
 
 				self.logger.error("test {} threw exception".format(relpath))
 				self.logger.error("exception: {}".format(e))
-				self.logger.error("traceback: {}".format(traceback.format_exec()))
+				self.logger.error("traceback: {}".format(traceback.format_exc()))
 				self.logger.error(failure_string())
 				return False
 
