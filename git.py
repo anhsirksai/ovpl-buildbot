@@ -36,8 +36,8 @@ class Git:
 		try:
 			clone_cmd & FG
 		except Exception, e:
-			logging.logger.error("unable to clone {}".format(remote))
-			logging.logger.error("exception: {}".format(e))
+			self.logger.error("unable to clone {}".format(remote))
+			self.logger.error("exception: {}".format(e))
 
 
 	def checkout(self):

@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.7
 import requests
+import plumbum
 import sys
 
 def bb_endpoint():
@@ -11,12 +12,11 @@ def bb_port():
 def bb_api():
 	return "build"
 
-def bb_hash():
-	return "8d9427ccb17b0a9d38947133292aa649ffe4b4d5"
+def bb_hash(git_sh):
+	return git_sh["rev-pase"]("HEAD")
 
-def bb_remote():
-	#return "https://bollu@github.com/bollu/ovpl.git"
-	return "https://github.com/bollu/ovpl.git"
+def bb_remote(git_sh):
+	return git_sh["config"]("--get remote.origin.url")
 
 
 def is_bb_alive():
@@ -37,7 +37,11 @@ if __name__ == "__main__":
 	else:
 		print "bb is alive"
 
-	data = {"remote": bb_remote(), "hash": bb_hash()}
+
+	git_sh = plumbum.local["git"]
+
+
+	data = {"remote": bb_remote(git_sh), "hash": bb_hash(git_sh)}
 	request_fmt =  "{endpoint}:{port}/{api}".format(endpoint=bb_endpoint(), port=bb_port(), api=bb_api())
 
 	print "request to: " + request_fmt
