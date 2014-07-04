@@ -18,7 +18,6 @@ def create_logger(name, file_path, should_log_stdout):
 		os.makedirs(directory)
 
 	logger = BuildbotLogger(logging.getLogger(name))
-
 	logger.setLevel(logging.DEBUG)
 
 	# Add the log message handler to the logger
@@ -46,14 +45,15 @@ class BuildbotLogger:
 		self.stream_handler = logging.StreamHandler(self.logged_string)
 		self.stream_handler.setFormatter(self.formatter)
 
+		#HACK - make this explicit / changeable
+		self.stream_handler.setLevel(logging.INFO)
+
 		logger.addHandler(self.stream_handler)
 
 	def get_logged_string(self):
 		return self.logged_string.getvalue()
 
 	def clear_logged_string(self):
-		#self.logged_string = StringIO.StringIO()
-		#self.stream_handler.setTarget(self.logged_string)
 		self.stream_handler.flush()
 		self.logged_string.seek(0)
 		self.logged_string.truncate(0)

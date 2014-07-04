@@ -73,8 +73,6 @@ if __name__ == "__main__":
 
 
 	logger = custom_logging.create_logger("buildbot", logger_path(), is_debug())
-
-
 	logger.info("logging is up")
 
 	if is_debug():

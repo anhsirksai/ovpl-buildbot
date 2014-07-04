@@ -82,7 +82,7 @@ class OVPL:
 				all_succeeded = False
 			else:
 				self.logger.info("test description->\n {}".format(get_test_description(testfn)))
-				self.logger.info("executing test() in file: {}".format(relpath))
+				self.logger.info("executing test()")
 
 				all_succeeded = self.execute_test(testfn, filepath, relpath) and all_succeeded
 
@@ -130,10 +130,10 @@ class OVPL:
 				success = testfn(self.logger)
 
 				if not isinstance(success, bool):
-					self.logger.error("!return value of test() is invalid: {}---".format(success))
+					self.logger.error("!return value of test() is invalid: {}-".format(success))
 					return False
 				elif success:
-					self.logger.info("+{} succeeded---".format(relpath))
+					self.logger.info("+{} succeeded-".format(relpath))
 					return True
 				else:
 					self.logger.error(failure_string())
