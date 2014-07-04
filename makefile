@@ -13,9 +13,9 @@ install: deps
 	chmod +x buildbot.py
 
 deps:
-	pip2.7 install logutils flask
+	pip2.7 install logutils flask requests plumbum
 
 	#install pygit (https://github.com/libgit2/pygit2)
 	#install libgit2
 	#pip2.7 install cffi
-	pip2.7 pygit2
+	#pip2.7 pygit2
