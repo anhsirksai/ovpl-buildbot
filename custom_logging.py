@@ -1,8 +1,15 @@
 #!/usr/bin/env python2.7
 import os
 import logging
-from logging.handlers import TimedRotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler, MemoryHandler
 import sys
+import StringIO
+
+
+def __create_formatter__():
+	return logging.Formatter(
+			'%(asctime)s - %(levelname)s : [%(filename)s:%(lineno)d] : %(message)s',
+			datefmt='%Y-%m-%d %I:%M:%S %p')
 
 def create_logger(name, file_path, should_log_stdout):
 	directory = os.path.dirname(file_path)
@@ -10,35 +17,71 @@ def create_logger(name, file_path, should_log_stdout):
 	if not os.path.exists(directory):
 		os.makedirs(directory)
 
-	logger = logging.getLogger(name)
+	logger = BuildbotLogger(logging.getLogger(name))
 
-	logger.setLevel(logging.DEBUG)   # make log level a setting
+	logger.setLevel(logging.DEBUG)
 
-	#don't attach the same handler multiple times
-	if logger.handlers == []:
-		# Add the log message handler to the logger
-		timed_rotating_handler = TimedRotatingFileHandler(
-									file_path, when='midnight', backupCount=5)
+	# Add the log message handler to the logger
+	timed_rotating_handler = TimedRotatingFileHandler(
+								file_path, when='midnight', backupCount=5)
 
-		formatter = logging.Formatter(
-			'%(asctime)s - %(levelname)s : [%(filename)s:%(lineno)d] : %(message)s',
-			datefmt='%Y-%m-%d %I:%M:%S %p')
-		timed_rotating_handler.setFormatter(formatter)
-		logger.addHandler(timed_rotating_handler)
+	logger.addHandler(timed_rotating_handler)
 
-		if should_log_stdout:
-			rainbow_handler = RainbowLoggingHandler(sys.stdout)
-			rainbow_handler.setFormatter(formatter)
-			logger.addHandler(rainbow_handler)
+	if should_log_stdout or True:
+		rainbow_handler = RainbowLoggingHandler(sys.stdout)
+		logger.addHandler(rainbow_handler)
 
-
-	logger.info("----------New Log---------")
+	logger.info("-New Log-")
 
 	return logger
 
+
+class BuildbotLogger:
+	def __init__(self, logger):
+		self.logger = logger
+
+		self.formatter = __create_formatter__()
+
+		self.logged_string = StringIO.StringIO()
+		self.stream_handler = logging.StreamHandler(self.logged_string)
+		self.stream_handler.setFormatter(self.formatter)
+
+		logger.addHandler(self.stream_handler)
+
+	def get_logged_string(self):
+		return self.logged_string.getvalue()
+
+	def clear_logged_string(self):
+		#self.logged_string = StringIO.StringIO()
+		#self.stream_handler.setTarget(self.logged_string)
+		self.stream_handler.flush()
+		self.logged_string.seek(0)
+		self.logged_string.truncate(0)
+
+	def setLevel(self, level):
+		self.logger.setLevel(level)
+
+	def hasNoHandlers(self):
+		return len(self.logger.handlers) == 0
+
+	def addHandler(self, handler):
+		handler.setFormatter(self.formatter)
+		self.logger.addHandler(handler)
+
+	def info(self, string):
+		self.logger.info(string)
+
+	def debug(self, string):
+		self.logger.debug(string)
+
+	def warn(self, string):
+		self.logger.warn(string)
+
+	def error(self, string):
+		self.logger.error(string)
+
+
 from logutils.colorize import ColorizingStreamHandler
-
-
 class RainbowLoggingHandler(ColorizingStreamHandler):
 	""" A colorful logging handler optimized for terminal debugging aestetichs.
 

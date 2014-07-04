@@ -45,17 +45,22 @@ def build_endpoint():
 	ovpl_instance = ovpl.OVPL(logger=logger, repo_folder_path=git_clone_path)
 	success = ovpl_instance.test()
 
+	log_string = logger.get_logged_string()
+	logger.clear_logged_string()
+
+	#return the output
 	if success:
 		logger.info("tests succeeded")
-		return make_response("build & test successful"), 200
+		return make_response("build & test successful. \nLog:\n{}".format(log_string)), 200
 	else:
 		logger.error("tests failed")
-		return make_response("build & test unsucessful"), 400
+		return make_response("build & test unsucessful. \nLog:\n{}".format(log_string)), 400
 
 
 @app.route("/")
 def slash_endpoint():
 	return "you're trying to reach buildbot. try and use /build ?"
+
 
 if __name__ == "__main__":
 	#logging
@@ -68,6 +73,8 @@ if __name__ == "__main__":
 
 
 	logger = custom_logging.create_logger("buildbot", logger_path(), is_debug())
+
+
 	logger.info("logging is up")
 
 	if is_debug():
