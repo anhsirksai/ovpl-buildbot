@@ -16,7 +16,7 @@ def bb_hash(git_sh):
 	return git_sh["rev-pase"]("HEAD")
 
 def bb_remote(git_sh):
-	return git_sh["config"]("--get remote.origin.url")
+	return git_sh["config"]["--get"]["remote.origin.url"]
 
 
 def is_bb_alive():
