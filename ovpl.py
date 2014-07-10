@@ -140,11 +140,8 @@ class OVPL:
 					return False
 
 			except Exception, e:
-				import traceback
-
 				self.logger.error("test {} threw exception".format(relpath))
-				self.logger.error("exception: {}".format(e))
-				self.logger.error("traceback: {}".format(traceback.format_exc()))
+				self.logger.error("exception:\n{}".format(e))
 				self.logger.error(failure_string())
 				return False
 
