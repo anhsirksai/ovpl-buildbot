@@ -14,6 +14,8 @@ logger = None
 def construct_clone_path(git_hash):
 	return str(os.path.join(os.path.abspath("./repos/"), git_hash))
 
+
+
 @app.route("/build", methods=["GET"])
 def build_endpoint():
 	git_hash = request.args.get("hash")
