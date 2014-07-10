@@ -31,8 +31,8 @@ def build_endpoint():
 		return make_response("git remote not sent"), 400
 
 
-	git_hash_str = str(git_hash).strip()
-	git_remote_str = str(git_remote).strip()
+	git_hash_str = str(git_hash).strip().strip('\n')
+	git_remote_str = str(git_remote).strip().strip('\n')
 
 	git_clone_path = construct_clone_path(git_hash)
 
