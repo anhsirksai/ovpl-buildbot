@@ -13,7 +13,7 @@ install: deps
 	chmod +x buildbot.py
 
 deps:
-	pip2.7 install logutils flask requests plumbum
+	pip2.7 install logutils flask requests plumbum IPy tornado netaddr pymongo sh 
 
 	#install pygit (https://github.com/libgit2/pygit2)
 	#install libgit2
